@@ -7,20 +7,46 @@ const MAX_HEIGHT = 6;
 
 function Square(props) {
   return (
-    <button className="square" onClick={props.onClick}>
+    <button className={props.visibility ? 'square visible' : 'square invisible'}
+    onClick={props.onClick}> 
       {props.value}
     </button>
   );
 }
 
 class Board extends React.Component {
+  visibleSquare(x,y) {
+    const squares = this.props.squares;
+    return [-1,0,1].map(dx =>
+      [-1,0,1].map(dy => {
+        const tx = x + dx;
+        const ty = y + dy;
+        if (ty < 0 || ty > MAX_HEIGHT*2-2 || tx < 0 || tx > MAX_WIDTH*2-2)
+          return false;
+        return squares[tx][ty] != null;
+      })
+    )
+    .reduce((a,c) => a.concat(c))
+    .reduce((a,c) => a || c);
+  }
+
   renderSquare(x,y) {
-    return (
-      <Square
-        value={this.props.squares[x][y]}
-        onClick={() => this.props.onClick(x,y)}
-      />
-    );
+    if (this.visibleSquare(x,y)) {
+      return (
+        <Square
+          value={this.props.squares[x][y]}
+          visibility={true}
+          onClick={() => this.props.onClick(x,y)}
+        />
+      );
+    } else {
+      return (
+        <Square
+          value="" visibility={false}
+          onClick={() => true}
+        />
+      );      
+    }
   }
 
   numRange() {
@@ -51,12 +77,18 @@ class Game extends React.Component {
     this.state = {
       history: [
         {
-          squares: Array(MAX_WIDTH*2 - 1).fill(Array(MAX_HEIGHT*2 - 1).fill(null))
+          squares: Array(MAX_WIDTH*2 - 1).fill(null)
         }
       ],
       stepNumber: 0,
       xIsNext: true
     };
+    // have to init 2D array this way; if you nest it in the hash literal
+    // above, you get the same array referenced in every row
+    for (let x=0; x < MAX_WIDTH*2 - 1; x++)
+      this.state.history[0].squares[x] = Array(MAX_HEIGHT*2 - 1).fill(null);
+    // place first move in the center
+    this.state.history[0].squares[MAX_WIDTH-1][MAX_HEIGHT-1] = "X";
   }
 
   handleClick(x,y) {
