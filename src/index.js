@@ -2,6 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
+const MAX_WIDTH = 6;
+const MAX_HEIGHT = 6;
+
 function Square(props) {
   return (
     <button className="square" onClick={props.onClick}>
@@ -20,10 +23,14 @@ class Board extends React.Component {
     );
   }
 
+  numRange() {
+    return this.props.squares.keys();
+  }
+
   render() {
-    const rows = [0,1,2].map(x => 
+    const rows = Array.from(this.numRange()).map(x => 
       <div className="board-row" key="{x}">
-        { [0,1,2].map(y => 
+        { Array.from(this.numRange()).map(y => 
           this.renderSquare(x,y)
           )
         }
@@ -44,7 +51,7 @@ class Game extends React.Component {
     this.state = {
       history: [
         {
-          squares: Array(3).fill(Array(3).fill(null))
+          squares: Array(MAX_WIDTH*2 - 1).fill(Array(MAX_HEIGHT*2 - 1).fill(null))
         }
       ],
       stepNumber: 0,
