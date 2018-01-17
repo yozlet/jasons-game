@@ -1,0 +1,12 @@
+TODO:
+
+display grid using loops
+gradual reveal display, up to width & height limit
+score calculation
+
+
+
+DONE:
+
+Start with tic-tac-toe tutorial
+make Square & rest of code (other than scorer) use 2d args
